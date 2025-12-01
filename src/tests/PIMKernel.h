@@ -84,19 +84,24 @@ class PIMKernel
     void programCrf(vector<PIMCmd>& cmds);
     void setControl(BurstType* bst, bool op, int crf_toggle_cond, bool grfA_zero, bool grfB_zero);
     unsigned getResultColGemv(int input_dim, int output_dim);
+    unsigned getResultColHammingDist(int input_dim, int output_dim);
     void changeBank(pimBankType bank_types, int& cidx, int& rank, int& bg, int& bank,
                     unsigned& startingRow, unsigned& startingCol, unsigned& row, unsigned& col);
     void preloadGemv(NumpyBurstType* operand, unsigned starting_row = 0, unsigned starting_col = 0);
+    void preloadHammingDist(NumpyBurstType* operand, unsigned starting_row = 0, unsigned starting_col = 0);
     void preloadNoReplacement(NumpyBurstType* operand, unsigned startingRow, unsigned startingCol);
     /*
     void preloadEltwise(NumpyBurstType* operand, pimBankType bank_types, unsigned startingRow,
                         unsigned startingCol);
     */
     void executeGemv(NumpyBurstType* w_data, NumpyBurstType* i_data, bool is_tree);
+    void executeHammingDist(NumpyBurstType* w_data, NumpyBurstType* i_data);
     void executeEltwise(int dim, pimBankType bank_types, KernelType ktype, int input0_row,
                         int result_row, int input1_row = 0);
     void computeGemv(NumpyBurstType* data, int num_input_tiles, int num_output_tile, int input_tile,
                      int output_tile, int batch_idx, pimBankType bank_types);
+    void computeHammingDist(NumpyBurstType* data, int num_input_tiles, int num_output_tile,
+                            int input_tile, int output_tile, int batch_idx, pimBankType bank_types);
     void computeAddOrMul(int numTile, int input0Row, int resultRow, int input1Row);
     void computeRelu(int numTile, int input0Row, int resultRow);
     // void computeBn(int numTile, int input0Row, int resultRow);

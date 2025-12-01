@@ -66,6 +66,11 @@ using std::ostream;
 #define PRINT(str)
 #define PRINTN(str)
 #else
+#define PRINTXXX(str)                         \
+    do                                     \
+    {                                      \
+                cout << str << endl;       \
+    } while (0)
 #define PRINT(str)                         \
     do                                     \
     {                                      \

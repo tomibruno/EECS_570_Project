@@ -40,3 +40,8 @@ print(batch_out)
 print(batch_out2)
 print(batch_in.shape)
 print(batch_out.shape)
+
+# print all the data in batch_in
+# for i in range(BATCH):
+#     for j in range(DIM_IN):
+#         print("Input Batch " + str(i) + " Index " + str(j) + " : " + str(batch_in[i][j]))

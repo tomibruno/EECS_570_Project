@@ -184,6 +184,18 @@ class DataDim
                 batch_size_ = input_npbst_.bShape[0];
                 return;
             }
+            case KernelType::HAMMING_DIST:
+            {
+                string output_dim_str = to_string(output_dim_);
+                string in_out_dim_str = output_dim_str + "x" + input_dim_str;
+                input_npbst_.loadFp16("data/hamming_dist/hamming_input_" + in_out_dim_str + ".npy");
+                weight_npbst_.loadFp16("data/hamming_dist/hamming_weight_" + in_out_dim_str + ".npy");
+                output_npbst_.loadFp16("data/hamming_dist/hamming_output_" + in_out_dim_str + ".npy");
+                output_dim_ = bShape1ToDim(output_npbst_.bShape[1]);
+                input_dim_ = bShape1ToDim(input_npbst_.bShape[1]);
+                batch_size_ = input_npbst_.bShape[0];
+                return;
+            }
             case KernelType::ADD:
             {
                 input_npbst_.loadFp16("data/add/resadd_input0_" + input_dim_str + ".npy");
@@ -233,6 +245,7 @@ class DataDim
         {
             case KernelType::GEMV:
             case KernelType::GEMVTREE:
+            case KernelType::HAMMING_DIST:
             {
                 weight_npbst_.shape.push_back(output_dim_);
                 weight_npbst_.shape.push_back(input_dim_);
@@ -336,6 +349,7 @@ class DataDim
         {
             case KernelType::GEMV:
             case KernelType::GEMVTREE:
+            case KernelType::HAMMING_DIST:
             {
                 cout << "  Weight data dimension : " << output_dim_ << "x" << input_dim_ << endl;
                 if (batch_size_ > 1)

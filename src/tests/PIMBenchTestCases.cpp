@@ -29,6 +29,14 @@ TEST_F(PIMBenchFixture, gemv)
     expectPIMBench(2.0);
 }
 
+TEST_F(PIMBenchFixture, hamming_dist)
+{
+    setPIMBenchTestCase(KernelType::HAMMING_DIST, 4096, 4096);
+    executeKernel();
+    executePIMKernel();
+    expectPIMBench(2.0);
+}
+
 TEST_F(PIMBenchFixture, mul)
 {
     setPIMBenchTestCase(KernelType::MUL, 2 * 1024 * 1024, 2 * 1024 * 1024);

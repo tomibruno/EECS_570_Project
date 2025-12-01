@@ -128,6 +128,17 @@ class PIMKernelFixture : public testing::Test
                                    dim_data->output_dim_ * dim_data->batch_size_, 0, 0, end_col);
                 break;
             }
+            case KernelType::HAMMING_DIST:
+            {
+                kernel->preloadHammingDist(&dim_data->weight_npbst_);
+                kernel->executeHammingDist(&dim_data->weight_npbst_, &dim_data->input_npbst_);
+                unsigned end_col = kernel->getResultColHammingDist(
+                    dim_data->dimTobShape(dim_data->input_dim_), dim_data->output_dim_);
+                result = new BurstType[dim_data->output_dim_ * dim_data->batch_size_];
+                kernel->readResult(result, pimBankType::ODD_BANK,
+                                   dim_data->output_dim_ * dim_data->batch_size_, 0, 0, end_col);
+                break;
+            }
             case KernelType::ADD:
             case KernelType::MUL:
             {

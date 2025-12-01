@@ -17,6 +17,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <cstdint>
 
 using namespace std;
 
@@ -29,7 +30,7 @@ enum class PIMCmdType
     MUL,
     MAC,
     MAD,
-    REV0,
+    XOR_POPCNT_ACC,
     REV1,
     REV2,
     MOV,
@@ -227,6 +228,8 @@ class PIMCmd
                 return "MAC";
             case PIMCmdType::MAD:
                 return "MAD";
+            case PIMCmdType::XOR_POPCNT_ACC:
+                return "XOR_POPCNT_ACC";
             default:
                 return "NOT_DEFINED";
         }

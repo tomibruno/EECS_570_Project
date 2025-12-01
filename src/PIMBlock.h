@@ -44,6 +44,7 @@ class PIMBlock
     void mac(BurstType& dstBst, BurstType& src0Bst, BurstType& src1Bst);
     void mul(BurstType& dstBst, BurstType& src0Bst, BurstType& src1Bst);
     void mad(BurstType& dstBst, BurstType& src0Bst, BurstType& src1Bst, BurstType& src2Bst);
+    void xor_popcnt_acc(BurstType& dstBst, BurstType& src0Bst, BurstType& src1Bst);
 
     std::string print();
 

@@ -334,6 +334,12 @@ void PIMRank::doPIM(BusPacket* packet)
                              << config.addrMapping.bankgroupId(packet->bank) << " b" << packet->bank
                              << " r" << packet->row << " c" << packet->column << "|| [" << pimPC_
                              << "] " << cCmd.toStr() << " @ " << currentClockCycle);
+            // cout << ((packet->busPacketType == READ) ? "READ ch" : "WRITE ch")
+            //                  << getChanId() << " ra" << getRankId() << " bg"
+            //                  << config.addrMapping.bankgroupId(packet->bank) << " b" << packet->bank
+            //                  << " r" << packet->row << " c" << packet->column << "|| [" << pimPC_
+            //                  << "] " << cCmd.toStr() << " @ " << currentClockCycle;
+            // cout << "GRF_A = " << pimBlocks[0].grfA[getGrfIdx(packet->column)].fp16ToStr() << std::endl;
         }
 
         if (cCmd.type_ == PIMCmdType::EXIT)
@@ -345,16 +351,19 @@ void PIMRank::doPIM(BusPacket* packet)
         {
             if (lastJumpIdx_ != pimPC_)
             {
+                //cout << "INFO ch" << getChanId() << ": JUMP lastJump != pimmC" << std::endl;
                 if (cCmd.loopCounter_ > 0)
                 {
                     lastJumpIdx_ = pimPC_;
                     numJumpToBeTaken_ = cCmd.loopCounter_;
+                    //cout << "INFO ch" << getChanId() << ": loopCounter > 0. numJumToBeTaken = " << numJumpToBeTaken_ << std::endl;
                 }
             }
             if (numJumpToBeTaken_ > 0)
             {
                 pimPC_ -= cCmd.loopOffset_;
                 numJumpToBeTaken_--;
+                //cout << "INFO ch" << getChanId() << ": decremented: numJumToBeTaken = " << numJumpToBeTaken_ << std::endl;
             }
         }
         else
@@ -398,10 +407,10 @@ void PIMRank::doPIM(BusPacket* packet)
 
                 if (DEBUG_PIM_BLOCK && pimblock_id == 0)
                 {
-                    PRINT("[BANK_R]" << packet->data->fp16ToStr());
-                    PRINT("[CMD]" << bitset<32>(cCmd.toInt()) << "(" << cCmd.toStr() << ")");
-                    PRINT(pimBlocks[pimblock_id].print());
-                    PRINT("----------");
+                    //PRINTXXX("[BANK_R]" << packet->data->fp16ToStr());
+                    //PRINTXXX("[CMD]" << bitset<32>(cCmd.toInt()) << "(" << cCmd.toStr() << ")");
+                    //PRINTXXX(pimBlocks[pimblock_id].print());
+                    //PRINTXXX("----------");
                 }
             }
         }
@@ -470,6 +479,21 @@ void PIMRank::doPIMBlock(BusPacket* packet, PIMCmd cCmd, int pimblock_id)
         }
 
         writeOpd(pimblock_id, dstBst, cCmd.dst_, packet, cCmd.dstIdx_, cCmd.isAuto_, is_mac);
+    }
+    else if (cCmd.type_ == PIMCmdType::XOR_POPCNT_ACC)
+    {
+        BurstType dstBst;
+        BurstType src0Bst;
+        BurstType src1Bst;
+
+        readOpd(pimblock_id, src0Bst, cCmd.src0_, packet, cCmd.src0Idx_, cCmd.isAuto_, true);
+        readOpd(pimblock_id, src1Bst, cCmd.src1_, packet, cCmd.src1Idx_, cCmd.isAuto_, true);
+        readOpd(pimblock_id, dstBst, cCmd.dst_, packet, cCmd.dstIdx_, cCmd.isAuto_, true);
+        
+        // dstBst = popcount(src0Bst XOR src1Bst) + dstBst;
+        pimBlocks[pimblock_id].xor_popcnt_acc(dstBst, src0Bst, src1Bst);
+
+        writeOpd(pimblock_id, dstBst, cCmd.dst_, packet, cCmd.dstIdx_, cCmd.isAuto_, true);
     }
     else if (cCmd.type_ == PIMCmdType::NOP && packet->busPacketType == WRITE)
     {

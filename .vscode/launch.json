@@ -1,0 +1,27 @@
+{
+        "version": "0.2.0",
+        "configurations": [
+            
+            {
+                "name": "Launch ./sim (gtest: PIMKernelFixture.gemv)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "/home/tbruno/eecs570/EECS_570_Project/sim",
+                "args": [
+                    "--gtest_filter=PIMKernelFixture.hamming_dist"
+                ],
+                "cwd": "/home/tbruno/eecs570/EECS_570_Project",
+                "stopAtEntry": false,
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "miDebuggerPath": "/usr/bin/gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            }
+        ]
+    }

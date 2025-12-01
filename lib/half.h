@@ -2159,6 +2159,41 @@ class half {
     /// \name Construction and assignment
     /// \{
 
+    void printBinary(uint16_t data) {
+        for (int i = 15; i >= 0; i--) {
+            std::cout << ((data >> i) & 1);
+        }
+    }
+
+    uint16_t popcnt(half &other, bool verbose = false) {
+        uint16_t x1 = this->data_;
+        uint16_t x2 = other.data_;
+        uint16_t result = x1 ^ x2;
+
+        if (verbose)
+        {
+            std::cout << "\t\tHere with " << *this << " and " << other << std::endl;
+            std::cout << "\t\tIn uint16: " << x1 << " and " << x2 << std::endl;
+            std::cout << "\t\tIn binary: "; printBinary(x1); 
+            std::cout << "\t\t     and: "; printBinary(x2); std::cout << std::endl;
+            std::cout << "\t\tAND is: " << result << std::endl; 
+            std::cout << "\t\t or ->    "; printBinary(result); std::cout << std::endl;
+        }
+
+        uint16_t count = 0;
+        while (result > 0)
+        {
+            count += result & 1;
+            result = result >> 1;
+        }
+
+        if (verbose)
+        {
+            std::cout << "\t\tPopCount: " << count << std::endl;
+        }
+        return count;
+    }
+
     /// Default constructor.
     /// This initializes the half to 0. Although this does not match the builtin types' default-initialization semantics
     /// and may be less efficient than no initialization, it is needed to provide proper value-initialization semantics.

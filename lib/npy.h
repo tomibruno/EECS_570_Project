@@ -23,6 +23,7 @@
 #ifndef NPY_H
 #define NPY_H
 
+#include <iterator>
 #include <algorithm>
 #include <complex>
 #include <cstdint>

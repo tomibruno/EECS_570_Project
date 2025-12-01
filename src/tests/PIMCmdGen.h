@@ -157,6 +157,43 @@ class GemvPIMKernel : public IPIMCmd
     }
 };
 
+
+class HammingDistancePIMKernel : public IPIMCmd
+{
+  public:
+    HammingDistancePIMKernel(KernelType ktype) : IPIMCmd(ktype) {}
+    virtual vector<PIMCmd> generateKernel(int num_jump_to_be_taken,
+                                          int num_jump_to_be_taken_odd_bank,
+                                          int num_jump_to_be_taken_even_bank) override
+    {
+        vector<PIMCmd> pim_cmds;
+        if (kernelType == KernelType::HAMMING_DIST)
+        {
+            // Similar to GEMV but uses XOR_POPCNT_ACC instead of MAC
+            vector<PIMCmd> tmp_cmds{
+                PIMCmd(PIMCmdType::XOR_POPCNT_ACC, PIMOpdType::GRF_B, PIMOpdType::GRF_A, PIMOpdType::EVEN_BANK,
+                       1, 0, 0, 0),
+                PIMCmd(PIMCmdType::JUMP, num_jump_to_be_taken_even_bank, 2),
+                PIMCmd(PIMCmdType::XOR_POPCNT_ACC, PIMOpdType::GRF_B, PIMOpdType::GRF_A, PIMOpdType::ODD_BANK,
+                       1, 0, 0, 0),
+                PIMCmd(PIMCmdType::JUMP, num_jump_to_be_taken_odd_bank, 2),
+                PIMCmd(PIMCmdType::NOP, 7),
+            };
+            pim_cmds.assign(tmp_cmds.begin(), tmp_cmds.end());
+        }
+        else
+        {
+            throw invalid_argument("Not supported hamming distance operation");
+        }
+        if (num_jump_to_be_taken != 0)
+        {
+            pim_cmds.push_back(PIMCmd(PIMCmdType::JUMP, num_jump_to_be_taken, pim_cmds.size() + 1));
+        }
+        pim_cmds.push_back(PIMCmd(PIMCmdType::EXIT, 0));
+        return pim_cmds;
+    }
+};
+
 class PIMCmdGen
 {
   public:
