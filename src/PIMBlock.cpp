@@ -94,12 +94,52 @@ void PIMBlock::xor_popcnt_acc(BurstType& dstBst, BurstType& src0Bst, BurstType& 
             fp16 d2 = src1Bst.fp16Data_[i];
             fp16 out = dstBst.fp16Data_[i];
             
-            uint16_t popcnt = d1.popcnt(d2, false);
+            uint16_t popcnt = d1.bitwise_xor_and_popcnt(d2);
             fp16 fpopcnt(popcnt); 
             dstBst.fp16Data_[i] = out + fpopcnt;
         }
 
         DEBUG("XOR_POPCNT_ACC " << src0Bst.hexToStr2() << "^popcnt+" << src1Bst.hexToStr2() << ""
+                     << dstBst.hexToStr2());
+    }
+    else if (pimPrecision_ == FP32)
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            // For FP32, treat as uint32 for XOR operation
+            uint32_t xor_result = src0Bst.u32Data_[i] ^ src1Bst.u32Data_[i];
+            uint32_t popcnt = __builtin_popcount(xor_result);
+            dstBst.u32Data_[i] = dstBst.u32Data_[i] + popcnt;
+        }
+    }
+    else
+    {
+        // For generic case, use integer XOR and popcount
+        for (int i = 0; i < 16; i++)
+        {
+            uint16_t xor_result = src0Bst.u16Data_[i] ^ src1Bst.u16Data_[i];
+            uint16_t popcnt = __builtin_popcount(xor_result);
+            dstBst.u16Data_[i] = dstBst.u16Data_[i] + popcnt;
+        }
+    }
+}
+
+void PIMBlock::xnor_popcnt_acc(BurstType& dstBst, BurstType& src0Bst, BurstType& src1Bst)
+{
+    if (pimPrecision_ == FP16)
+    {
+        for (int i = 0; i < 16; i++)
+        {
+            fp16 d1 = src0Bst.fp16Data_[i];
+            fp16 d2 = src1Bst.fp16Data_[i];
+            fp16 out = dstBst.fp16Data_[i];
+            
+            uint16_t popcnt = d1.bitwise_xnor_and_popcnt(d2);
+            fp16 fpopcnt(popcnt); 
+            dstBst.fp16Data_[i] = out + fpopcnt;
+        }
+
+        DEBUG("XNOR_POPCNT_ACC " << src0Bst.hexToStr2() << "^popcnt+" << src1Bst.hexToStr2() << ""
                      << dstBst.hexToStr2());
     }
     else if (pimPrecision_ == FP32)

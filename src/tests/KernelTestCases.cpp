@@ -149,8 +149,8 @@ TEST_F(PIMKernelFixture, hamming_dist)
     shared_ptr<PIMKernel> kernel = make_pim_kernel();
 
     uint32_t batch_size = 1;
-    uint32_t output_dim = 4096*2; // This must be a multiple of 4096 (because each tile has 8 rows -> 4096/8 = 512 = 512 PIMs)
-    uint32_t input_dim = 1024; // This must be a multiple of 1024 (because each tile has 8 bursts  -> 1024/8 = 128 = width of bank)
+    uint32_t output_dim = 4096;
+    uint32_t input_dim = 1024;
 
     DataDim *dim_data = new DataDim(KernelType::HAMMING_DIST, batch_size, output_dim, input_dim, true);
     dim_data->printDim(KernelType::HAMMING_DIST);
@@ -167,3 +167,25 @@ TEST_F(PIMKernelFixture, hamming_dist)
     delete dim_data;
 }
 
+TEST_F(PIMKernelFixture, binary_gemv)
+{
+    shared_ptr<PIMKernel> kernel = make_pim_kernel();
+
+    uint32_t batch_size = 1;
+    uint32_t output_dim = 4096;
+    uint32_t input_dim = 1024;
+
+    DataDim *dim_data = new DataDim(KernelType::BINARY_GEMV, batch_size, output_dim, input_dim, true);
+    dim_data->printDim(KernelType::BINARY_GEMV);
+
+    reduced_result_ = new BurstType[dim_data->dimTobShape(output_dim)];
+    result_ = getResultPIM(KernelType::BINARY_GEMV, dim_data, kernel, result_);
+
+    testStatsClear();
+    expectAccuracy(KernelType::GEMV, output_dim, dim_data->output_npbst_,
+                   dim_data->getNumElementsPerBlocks());
+
+    delete[] result_;
+    delete[] reduced_result_;
+    delete dim_data;
+}

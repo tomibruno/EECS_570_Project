@@ -31,6 +31,7 @@ enum class PIMCmdType
     MAC,
     MAD,
     XOR_POPCNT_ACC,
+    XNOR_POPCNT_ACC,
     REV1,
     REV2,
     MOV,
@@ -230,6 +231,8 @@ class PIMCmd
                 return "MAD";
             case PIMCmdType::XOR_POPCNT_ACC:
                 return "XOR_POPCNT_ACC";
+            case PIMCmdType::XNOR_POPCNT_ACC:
+                return "XNOR_POPCNT_ACC";
             default:
                 return "NOT_DEFINED";
         }

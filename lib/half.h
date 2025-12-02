@@ -2165,20 +2165,11 @@ class half {
         }
     }
 
-    uint16_t popcnt(half &other, bool verbose = false) {
+
+    uint16_t bitwise_xnor_and_popcnt(half &other) {
         uint16_t x1 = this->data_;
         uint16_t x2 = other.data_;
-        uint16_t result = x1 ^ x2;
-
-        if (verbose)
-        {
-            std::cout << "\t\tHere with " << *this << " and " << other << std::endl;
-            std::cout << "\t\tIn uint16: " << x1 << " and " << x2 << std::endl;
-            std::cout << "\t\tIn binary: "; printBinary(x1); 
-            std::cout << "\t\t     and: "; printBinary(x2); std::cout << std::endl;
-            std::cout << "\t\tAND is: " << result << std::endl; 
-            std::cout << "\t\t or ->    "; printBinary(result); std::cout << std::endl;
-        }
+        uint16_t result = ~(x1 ^ x2);
 
         uint16_t count = 0;
         while (result > 0)
@@ -2186,10 +2177,19 @@ class half {
             count += result & 1;
             result = result >> 1;
         }
+        return count;
+    }
 
-        if (verbose)
+    uint16_t bitwise_xor_and_popcnt(half &other) {
+
+        uint16_t x1 = this->data_;
+        uint16_t x2 = other.data_;
+        uint16_t result = x1 ^ x2;
+        uint16_t count = 0;
+        while (result > 0)
         {
-            std::cout << "\t\tPopCount: " << count << std::endl;
+            count += result & 1;
+            result = result >> 1;
         }
         return count;
     }

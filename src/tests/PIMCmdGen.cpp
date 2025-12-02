@@ -41,6 +41,9 @@ vector<PIMCmd> PIMCmdGen::getPIMCmds(KernelType ktype, int num_jump_to_be_taken,
         case KernelType::HAMMING_DIST:
             pim_kernel = make_unique<HammingDistancePIMKernel>(ktype);
             break;
+        case KernelType::BINARY_GEMV:
+            pim_kernel = make_unique<BinaryGemvPIMKernel>(ktype);
+            break;
         case KernelType::GEMVTREE:
             pim_kernel = make_unique<GemvPIMKernel>(ktype);
             break;

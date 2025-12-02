@@ -91,6 +91,7 @@ enum class KernelType
     GEMV,
     MUL,
     GEMVTREE,
-    HAMMING_DIST
+    HAMMING_DIST,
+    BINARY_GEMV
 };
 #endif

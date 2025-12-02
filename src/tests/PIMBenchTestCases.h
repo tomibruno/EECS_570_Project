@@ -80,6 +80,10 @@ class PIMBenchTestCase
         {
             return string{"HAMMING_DIST"};
         }
+        else if (k == KernelType::BINARY_GEMV)
+        {
+            return string{"BINARY_GEMV"};
+        }
         else if (k == KernelType::MUL)
         {
             return string{"MUL"};
@@ -170,6 +174,43 @@ class HammingDistPIMBenchTest : public PIMBenchTestCase
         if (is_pim_ == true)
         {
             kernel_->executeHammingDist(&dim_data_->weight_npbst_, &dim_data_->input_npbst_);
+            kernel_->runPIM();
+            cycle = kernel_->getCycle();
+        }
+        else
+        {
+            uint32_t input_data_size_in_byte =
+                dim_data_->getDataSize(dim_data_->input_dim_, dim_data_->batch_size_);
+            uint32_t output_data_size_in_byte =
+                dim_data_->getDataSize(dim_data_->output_dim_, dim_data_->batch_size_);
+            uint32_t weight_data_size_in_byte =
+                dim_data_->getDataSize(dim_data_->output_dim_, dim_data_->input_dim_);
+            starting_addr = genMemTraffic(mem_, false, weight_data_size_in_byte, starting_addr);
+            starting_addr = genMemTraffic(mem_, false, input_data_size_in_byte, starting_addr);
+            run(mem_, &cycle);
+            genMemTraffic(mem_, true, output_data_size_in_byte, starting_addr);  // result-vec
+            run(mem_, &cycle);
+        }
+        return cycle;
+    }
+};
+
+class BinaryGemvPIMBenchTest : public PIMBenchTestCase
+{
+  public:
+    BinaryGemvPIMBenchTest(KernelType k, unsigned b, unsigned out, unsigned in)
+        : PIMBenchTestCase(k, b, out, in)
+    {
+    }
+
+    uint64_t measureCycle(bool is_pim_)
+    {
+        uint64_t cycle = 0;
+        uint64_t starting_addr = 0;
+
+        if (is_pim_ == true)
+        {
+            kernel_->executeBinaryGemv(&dim_data_->weight_npbst_, &dim_data_->input_npbst_);
             kernel_->runPIM();
             cycle = kernel_->getCycle();
         }
@@ -306,6 +347,10 @@ class PIMBenchFixture : public testing::Test
         else if (k == KernelType::HAMMING_DIST)
         {
             perfTest = new HammingDistPIMBenchTest(k, batch, out, in);
+        }
+        else if (k == KernelType::BINARY_GEMV)
+        {
+            perfTest = new BinaryGemvPIMBenchTest(k, batch, out, in);
         }
         else if (k == KernelType::MUL || k == KernelType::ADD)
         {
